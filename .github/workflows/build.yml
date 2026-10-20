@@ -1,0 +1,23 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+      - run: cmake --build build --config Release
+      - run: ctest --test-dir build -C Release --output-on-failure
+      - name: rule check on the sample
+        shell: bash
+        run: |
+          bin=build/govdoc
+          [ -f build/Release/govdoc.exe ] && bin=build/Release/govdoc.exe
+          $bin samples/sample_plan_en.txt --rules-only
