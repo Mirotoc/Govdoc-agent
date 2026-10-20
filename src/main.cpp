@@ -7,9 +7,10 @@
 
 static void print(const Issue& i) {
     std::cout << "[" << i.block_id << "] " << i.type << " (" << i.severity << ")\n"
-              << "  근거: " << i.evidence << "\n"
-              << "  제안: " << i.suggestion << "\n"
-              << "  이유: " << i.reason << "\n\n";
+              << "  evidence:   " << i.evidence << "\n"
+              << "  suggestion: " << i.suggestion << "\n"
+              << "  reason:     " << i.reason << "\n"
+              << "  source:     " << i.source << "\n\n";
 }
 
 int main(int argc, char** argv) {
@@ -18,7 +19,7 @@ int main(int argc, char** argv) {
     SetConsoleCP(CP_UTF8);
 #endif
     if (argc < 2) {
-        std::cout << "사용법: govdoc <문서.txt> [--rules-only] [--label] [--model 이름]\n";
+        std::cout << "Usage: govdoc <document.txt> [--rules-only] [--label] [--model name]\n";
         return 1;
     }
 
@@ -39,11 +40,11 @@ int main(int argc, char** argv) {
             issues.insert(issues.end(), ai.begin(), ai.end());
         }
 
-        std::cout << "확인이 필요한 곳을 " << issues.size() << "개 찾았어요.\n"
-                  << "AI가 만든 제안이에요. 최종 판단은 담당자가 해 주세요.\n\n";
+        std::cout << "Found " << issues.size() << " item(s) to review.\n"
+                  << "These are suggestions. You make the final call.\n\n";
         for (const auto& i : issues) print(i);
 
-        if (label) label_issues(issues, "data/labels.jsonl", model);
+        if (label) label_issues(issues, "data/labels.jsonl");
     } catch (const std::exception& e) {
         std::cerr << e.what() << "\n";
         return 1;

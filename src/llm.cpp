@@ -29,7 +29,7 @@ static std::string post_local(const std::string& path, const std::string& body) 
 
     if (connect(sock, (sockaddr*)&addr, sizeof addr) != 0) {
         closesocket(sock);
-        throw std::runtime_error("Ollama가 켜져 있는지 확인해 주세요 (127.0.0.1:11434)");
+        throw std::runtime_error("Cannot reach Ollama. Make sure it is running on 127.0.0.1:11434");
     }
 
     std::string request = "POST " + path + " HTTP/1.0\r\n"
@@ -65,14 +65,14 @@ std::vector<Issue> ask_llm(const std::vector<Block>& blocks, const std::string& 
                        "\"prompt\":\"" + json_escape(doc) + "\"}";
     std::string reply = post_local("/api/generate", body);
     std::string error = json_field(reply, "error");
-    if (!error.empty()) throw std::runtime_error("모델이 응답하지 못했어요: " + error);
+    if (!error.empty()) throw std::runtime_error("The model returned an error: " + error);
     std::string answer = json_field(reply, "response");
 
     std::vector<Issue> issues;
     for (const auto& line : split(answer, '\n')) {
         auto f = split(line, '|');
         if (!is_valid(f)) continue;
-        Issue issue{f[0], f[1], f[2], f[3], f[4], f[5]};
+        Issue issue{f[0], f[1], f[2], f[3], f[4], f[5], model};
         bool seen = std::any_of(issues.begin(), issues.end(), [&](const Issue& i) {
             return i.block_id == issue.block_id && i.type == issue.type && i.suggestion == issue.suggestion;
         });

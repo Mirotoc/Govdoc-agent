@@ -1,55 +1,55 @@
-# 준수 체크리스트
+# Compliance Checklist
 
-> 개발자가 정리한 참고용 체크리스트예요. **법률 자문이 아니에요.**
-> 법령과 지침은 자주 바뀌니 [국가법령정보센터](https://www.law.go.kr)와 각 부처 공지에서 원문을 확인해 주세요.
-> 실제 기관에 도입하기 전에는 보안담당관과 법무 검토를 꼭 받아야 해요.
+> This is a developer's reference checklist, **not legal advice.**
+> Laws and guidelines change often. Check the original texts on the [Korean Law Information Center](https://www.law.go.kr) and the relevant ministries' notices.
+> Any real deployment needs a review by the institution's security officer and legal team.
 
 <br>
 
-## 국내 법령과 지침
+## Korean laws and guidelines
 
-| 기준 | 관련된 부분 | 대응 |
+| Reference | Where it applies | How the design responds |
 |---|---|---|
-| 개인정보 보호법 | 문서 속 이름, 연락처, 주민등록번호 | PC 안에서만 처리하고, AI에 보내기 전에 가려요. 보관기간과 파기 절차를 정해요 |
-| 개인정보위 가명정보 처리 가이드라인 | 라벨 데이터를 학습에 쓰는 일 | 가명처리 기준을 문서로 남기고 다시 식별될 위험을 점검해요 |
-| 인공지능기본법 (2026.1.22 시행) | AI 결과물의 투명성과 안전성 | 출력마다 "AI가 만든 제안"이라고 알려요. 고영향 AI에 해당하는지 판단한 기록을 남겨요 |
-| 과기정통부 AI 가이드라인 (투명성 · 안전성 · 영향평가) | 위와 같아요 | 항목별 대응표를 만들 예정이에요 |
-| 국가정보원 국가망보안체계(N²SF) | 공공기관 업무망에서 쓰는 경우 | 업무 정보 등급을 확인하고 해당 등급의 망 안에서만 운영해요 |
-| 오픈소스 라이선스 | 모델과 도구 | 모델은 Apache-2.0(Qwen3.5)을 쓰고, 코드는 외부 라이브러리를 쓰지 않아요 |
+| Personal Information Protection Act | Names, contact details, and resident registration numbers in documents | Processed only on the PC and masked before reaching the model. Retention and deletion rules to be defined |
+| PIPC Pseudonymization Guidelines | Using label data for training | Document the pseudonymization rules and check re-identification risk |
+| AI Basic Act (in force since 2026-01-22) and its Enforcement Decree | Transparency and safety of AI output | Every run says the findings are AI suggestions. Record whether the tool counts as high-impact AI |
+| MSIT AI guidelines (transparency, safety, impact assessment) | Same as above | A clause-by-clause response table is planned |
+| NIS National Network Security Framework (N2SF) | Use inside a public institution's work network | Confirm the data classification level and run only inside a network of that level |
+| Open-source licenses | Models and tools | The model is Apache-2.0 (Qwen3.5). The code uses no third-party libraries |
 
 <br>
 
-## 국제 표준
+## International standards
 
-| 표준 | 내용 | 적용 |
+| Standard | Scope | Application |
 |---|---|---|
-| ISO/IEC 27001 | 정보보안 관리체계 | 접근 통제, 암호화, 기록, 자산 관리 |
-| ISO/IEC 27701 | 개인정보 관리 | 개인정보 처리 흐름과 처리 근거 정리 |
-| ISO/IEC 42001 | AI 경영시스템 | AI 사용 정책, 역할과 책임, 모델 버전 관리 |
-| ISO/IEC 23894 | AI 위험관리 | 오탐, 미탐, AI 결과를 과하게 믿는 위험 평가 |
-| ISO/IEC 5259 | AI 데이터 품질 | 라벨 일치도, 데이터 출처와 버전 관리 |
+| ISO/IEC 27001 | Information security management | Access control, encryption, logging, asset management |
+| ISO/IEC 27701 | Privacy information management | Personal data flow and legal basis for processing |
+| ISO/IEC 42001 | AI management systems | AI use policy, roles and responsibilities, model version control |
+| ISO/IEC 23894 | AI risk management | False positives, false negatives, and over-reliance on AI output |
+| ISO/IEC 5259 | Data quality for AI | Label agreement, data provenance, and versioning |
 
 <br>
 
-## 단계별 확인 항목
+## Checklist by phase
 
-**설계**
-- [x] 데이터 흐름도 작성
-- [x] 외부 전송 없음 원칙을 코드에 고정 (`127.0.0.1`)
-- [x] 사용할 모델의 라이선스 확인
+**Design**
+- [x] Data flow diagram
+- [x] Zero egress fixed in code (`127.0.0.1`)
+- [x] Model license checked
 
-**개발**
-- [x] 개인정보를 AI 호출보다 먼저 가리기
-- [x] 라벨에 시각과 모델 버전 남기기
-- [ ] 검수자 정보와 감사 기록 추가
-- [ ] 실제 문서를 커밋하지 못하게 막는 검사 추가
+**Development**
+- [x] Personal data masked before the model call
+- [x] Labels record their source and a timestamp
+- [ ] Reviewer identity and audit log
+- [ ] Pre-commit check that blocks real documents
 
-**학습 데이터**
-- [ ] 라벨 데이터 가명처리 기준 문서화
-- [ ] 보관기간과 파기 절차
+**Training data**
+- [ ] Pseudonymization rules documented
+- [ ] Retention period and deletion procedure
 
-**도입 전**
-- [ ] 기관 보안성 검토
-- [ ] 개인정보 영향평가 대상인지 확인
-- [ ] 고영향 AI 해당 여부 판단 기록
-- [ ] 사용자 안내: AI 제안은 참고용이고 최종 책임은 담당자에게 있어요
+**Before deployment**
+- [ ] Institutional security review
+- [ ] Check whether a privacy impact assessment is required
+- [ ] Record the high-impact AI assessment
+- [ ] User notice: AI findings are advisory, and responsibility stays with the reviewer

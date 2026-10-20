@@ -4,7 +4,7 @@
 
 std::vector<Block> load_blocks(const std::string& path) {
     std::ifstream file(path, std::ios::binary);
-    if (!file) throw std::runtime_error("파일을 열 수 없어요: " + path);
+    if (!file) throw std::runtime_error("Cannot open file: " + path);
 
     std::vector<Block> blocks;
     std::string line, paragraph;

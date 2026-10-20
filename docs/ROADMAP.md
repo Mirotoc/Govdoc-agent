@@ -1,15 +1,15 @@
-# 로드맵
+# Roadmap
 
-| 단계 | 목표 | 상태 |
+| Phase | Goal | Status |
 |---|---|---|
-| 0. 구상 | 아이디어, 설계, 라벨 체계 공개 | ✅ |
-| 1. 프로토타입 | 텍스트 문서 → 규칙 검사 → 로컬 AI 검토 → 라벨 저장 | ✅ |
-| 2. 문서 형식 | HWPX(압축된 XML) 읽기, PDF는 텍스트 추출 뒤 입력 | 🔜 |
-| 3. 화면 인식 | Windows 기본 API로 화면을 캡처해 멀티모달 모델에 전달 | 🔜 |
-| 4. 규칙 확장 | 금액 합계, 필수 항목 누락, 공고별 양식 검사 | 🔜 |
-| 5. 첫 학습 | 라벨 300건 이상으로 LoRA 미세조정하고 평가 | 🔜 |
-| 6. 보안 점검 | 외부 연결이 없는지 확인하는 점검 보고서 작성 | 🔜 |
-| 7. 배포 | 인터넷 없이 설치할 수 있는 설치 파일 | 🔜 |
+| 0. Concept | Publish the idea, the design, and the label schema | Done |
+| 1. Prototype | Text document, rule check, local AI review, saved labels | Done |
+| 2. File formats | Read HWPX directly (zipped XML); accept PDF after text extraction | Planned |
+| 3. Screen capture | Capture the screen with native OS APIs and pass it to a multimodal model | Planned |
+| 4. More rules | Budget totals, missing required fields, per-call template checks | Planned |
+| 5. First training | LoRA fine-tuning on 300+ labels, with evaluation | Planned |
+| 6. Security audit | A written check that the tool makes no external connections | Planned |
+| 7. Packaging | An installer that works without internet access | Planned |
 
-새 기능도 지금처럼 **외부 라이브러리 없이 표준 C++와 운영체제 기본 기능만** 쓰는 것을 원칙으로 해요.
-학습 단계는 예외로 Python 기반 학습 도구를 쓰지만, 검토 프로그램과는 분리해서 운영해요.
+New features keep the same rule: **standard C++ and native OS APIs only.**
+Fine-tuning is the one exception. It uses a Python training tool, kept separate from the review program.

@@ -2,91 +2,97 @@
 
 # Govdoc Agent
 
-<sub>Local AI-powered Government Document Review & Editing Agent</sub>
+**A local AI agent that reviews government project documents without sending a single byte off your PC.**
 
-**정부사업 문서를 내 PC 안에서만 검토하는 AI예요.**
-문서를 인터넷으로 보내지 않고, 내 PC에 설치한 작은 언어모델(로컬 LLM)로 오류를 찾고 고칠 방법을 제안해요.
+[![build](https://github.com/Mirotoc/Govdoc-agent/actions/workflows/build.yml/badge.svg)](https://github.com/Mirotoc/Govdoc-agent/actions/workflows/build.yml)
+![C++17](https://img.shields.io/badge/C%2B%2B-17-256ef4)
+![dependencies](https://img.shields.io/badge/dependencies-none-256ef4)
+![LLM](https://img.shields.io/badge/LLM-local%20only-256ef4)
+![vibe coded](https://img.shields.io/badge/vibe%20coded-Claude%20Code-464c53)
+![license](https://img.shields.io/badge/license-MIT-464c53)
 
-> 🤖 **바이브 코딩으로 만든 프로젝트예요.** AI 코딩 도구(Claude Code)와 대화하며 설계하고 구현했어요.
-> 제가 바이브 코더로서 처음 시작하는 프로젝트이고, 지금은 **아이디어 구상과 첫 프로토타입** 단계예요.
-
-<br>
-
-## 왜 만들었나요
-
-정부사업 문서에는 사업비, 참여기관, 개인정보, 공개되지 않은 기술 내용이 들어 있어요.
-이런 문서를 클라우드 AI에 올리면 데이터가 외부 서버로 넘어가고, 보안 규정을 어길 수 있어요.
-
-그래서 원칙을 하나 정했어요.
-
-> **문서는 PC 밖으로 나가지 않아요.**
-
-- AI 모델을 내 PC에 직접 설치해서 써요.
-- 검토, 라벨링, 학습을 모두 PC 안(또는 기관 내부망)에서 해요.
-- 인터넷은 처음 모델을 내려받을 때만 써요.
+> **Vibe-coded.** I built this project by directing an AI coding agent (Claude Code) in plain language: I set the goals, constraints, and quality bar, and the agent wrote and tested the code with me.
+> This is my first public vibe-coding project. The full build log, including the prompts that shaped it and the bugs we hit along the way, is in [docs/VIBE_CODING.md](docs/VIBE_CODING.md).
 
 <br>
 
-## 무엇을 하나요
+## The problem
 
-| 단계 | 하는 일 | 상태 |
+Government project documents (R&D proposals, project plans, final reports) contain budgets, partner details, personal information, and unpublished technical content.
+Pasting them into a cloud AI service sends that data to an external server, which can break security rules for public institutions and create legal risk.
+
+So the project starts from one rule:
+
+> **Documents never leave the PC.**
+
+- The language model is installed and run on the user's own machine.
+- Review, labeling, and fine-tuning all happen on that machine or inside the organization's closed network.
+- The internet is needed only once, to download the model.
+
+<br>
+
+## What it does
+
+| Step | What happens | Status |
 |---|---|---|
-| 읽기 | 문서를 문단 단위 블록으로 나눠요 | ✅ 텍스트 파일 지원 |
-| 규칙 검사 | 주민등록번호와 휴대전화 번호를 찾아 가리고, 거꾸로 적힌 기간을 찾아요 | ✅ |
-| AI 검토 | 금액 합계, 맞춤법, 용어, 누락된 항목을 로컬 LLM이 검토해요 | ✅ Ollama 연동 |
-| 라벨링 | 담당자가 AI 제안을 승인·수정·거절하면 학습 데이터로 저장돼요 | ✅ 터미널에서 |
-| 학습 | 쌓인 라벨로 모델을 우리 기관 문서에 맞게 미세조정해요 | 🔜 설정 초안 |
-| 화면 인식 | 화면 캡처나 스캔본을 멀티모달 모델로 읽어요 | 🔜 계획 |
+| Read | Splits a document into numbered paragraph blocks | Done (plain text) |
+| Rule check | Finds and masks resident registration numbers and phone numbers, flags reversed date ranges | Done |
+| AI review | A local LLM checks totals, spelling, terminology, and missing items | Done (via Ollama) |
+| Labeling | A reviewer accepts, edits, or rejects each finding; every decision is saved as training data | Done (terminal) |
+| Fine-tuning | Labels are used to adapt the model to an organization's documents with LoRA | Config draft |
+| Screen capture | Read screenshots and scanned pages with a multimodal model | Planned |
 
-AI는 **제안만 해요.** 최종 판단은 언제나 담당자가 해요.
+The AI only **suggests**. A person always makes the final call.
 
 <br>
 
-## 어떻게 동작하나요
+## How it works
 
 ```mermaid
-%%{init: {'theme':'base','themeVariables':{'fontFamily':'Pretendard GOV, Pretendard, Malgun Gothic, sans-serif','primaryColor':'#ecf2fe','primaryBorderColor':'#256ef4','primaryTextColor':'#1e2124','lineColor':'#6d7882','clusterBkg':'#f4f5f6','clusterBorder':'#cdd1d5'}}}%%
+%%{init: {'theme':'base','themeVariables':{'fontFamily':'Segoe UI, Helvetica, Arial, sans-serif','primaryColor':'#ecf2fe','primaryBorderColor':'#256ef4','primaryTextColor':'#1e2124','lineColor':'#6d7882','clusterBkg':'#f4f5f6','clusterBorder':'#cdd1d5'}}}%%
 flowchart LR
-    subgraph PC["내 PC · 외부 전송 없음"]
-        A[문서] --> B[블록 나누기]
-        B --> C[규칙 검사<br/>개인정보 가리기]
-        C --> D[로컬 LLM<br/>127.0.0.1]
-        D --> E[검토 결과]
+    subgraph PC["Your PC - nothing leaves this box"]
+        A[Document] --> B[Split into blocks]
+        B --> C[Rule check<br/>mask personal data]
+        C --> D[Local LLM<br/>127.0.0.1 only]
+        D --> E[Findings]
         C --> E
-        E --> F[담당자 검수<br/>승인 · 수정 · 거절]
-        F --> G[(라벨 데이터<br/>암호화 저장소)]
-        G -.-> H[미세조정]
+        E --> F[Human review<br/>accept / edit / reject]
+        F --> G[(Labels<br/>encrypted drive)]
+        G -.-> H[LoRA fine-tuning]
         H -.-> D
     end
 ```
 
-- 개인정보는 **AI에 보내기 전에** 먼저 가려요.
-- 프로그램은 `127.0.0.1`(내 PC)에만 접속하도록 코드에 고정되어 있어요. 다른 주소로 바꾸는 설정 자체가 없어요.
+- Personal data is masked **before** anything is sent to the model.
+- The only network address in the code is `127.0.0.1`. There is no setting that could point it anywhere else.
 
 <br>
 
-## 코드 둘러보기
+## Code tour
 
-외부 라이브러리 없이 **표준 C++17**로만 짰어요. 전체 370줄이고, 파일 하나가 한 가지 일만 해요.
+Standard C++17 only, no third-party libraries. 378 lines in total, and each file does one job.
 
-| 파일 | 하는 일 | 줄 수 |
+| File | Responsibility | Lines |
 |---|---|---|
-| [`src/core.hpp`](src/core.hpp) | 데이터 구조(`Block`, `Issue`)와 함수 목록 | 31 |
-| [`src/main.cpp`](src/main.cpp) | 실행 흐름: 읽기 → 규칙 → AI → 출력 → 라벨링 | 52 |
-| [`src/document.cpp`](src/document.cpp) | 텍스트 문서를 문단 블록으로 나누기 | 29 |
-| [`src/rules.cpp`](src/rules.cpp) | 정규식으로 개인정보와 기간 오류 찾기 | 31 |
-| [`src/llm.cpp`](src/llm.cpp) | 소켓으로 로컬 Ollama에 요청하고 응답 해석 | 82 |
-| [`src/label.cpp`](src/label.cpp) | 승인·수정·거절을 받아 JSONL로 저장 | 47 |
-| [`src/text.cpp`](src/text.cpp) | JSON 문자열 처리, 문자열 나누기 | 75 |
-| [`tests/rules_test.cpp`](tests/rules_test.cpp) | 규칙 검사와 JSON 처리 테스트 | 23 |
+| [`src/core.hpp`](src/core.hpp) | Data types (`Block`, `Issue`) and every function signature | 32 |
+| [`src/main.cpp`](src/main.cpp) | Program flow: read, rules, AI, print, label | 53 |
+| [`src/document.cpp`](src/document.cpp) | Splits a text document into paragraph blocks | 29 |
+| [`src/rules.cpp`](src/rules.cpp) | Regex checks for personal data and reversed dates | 34 |
+| [`src/llm.cpp`](src/llm.cpp) | Talks to the local Ollama server over a raw socket and parses the reply | 82 |
+| [`src/label.cpp`](src/label.cpp) | Collects accept / edit / reject decisions and writes JSONL | 47 |
+| [`src/text.cpp`](src/text.cpp) | Minimal JSON string handling and splitting | 75 |
+| [`tests/rules_test.cpp`](tests/rules_test.cpp) | Tests for rules, masking, and parsing | 26 |
 
-처음 보는 분은 `core.hpp` → `main.cpp` 순서로 읽으면 전체 흐름을 바로 볼 수 있어요.
+New to the code? Read `core.hpp`, then `main.cpp`. That is the whole program flow in under 90 lines.
+
+Why no libraries? Fewer dependencies mean fewer things a security reviewer has to audit, and this tool is meant for environments where every installed component needs approval.
 
 <br>
 
-## 실행해 보기
+## Try it
 
-**1. 빌드해요** (CMake, C++17 컴파일러)
+**1. Build** (CMake and any C++17 compiler)
 
 ```bash
 cmake -S . -B build
@@ -94,97 +100,117 @@ cmake --build build --config Release
 ctest --test-dir build -C Release
 ```
 
-**2. 규칙 검사만 해 봐요** (AI 없이도 돼요)
+**2. Run the rule check** (no AI needed)
 
 ```bash
-build/Release/govdoc samples/sample_plan.txt --rules-only
+build/Release/govdoc samples/sample_plan_en.txt --rules-only
 ```
 
-**3. 로컬 AI를 연결해요** (처음 한 번만 인터넷이 필요해요)
+**3. Connect the local model** (internet needed once, for the download)
 
 ```bash
 ollama pull qwen3.5:4b
 ollama create govdoc-reviewer -f models/Modelfile
-build/Release/govdoc samples/sample_plan.txt
+build/Release/govdoc samples/sample_plan_en.txt
 ```
 
-**4. 결과를 검수하고 라벨로 저장해요**
+**4. Review the findings and save them as labels**
 
 ```bash
-build/Release/govdoc samples/sample_plan.txt --label
+build/Release/govdoc samples/sample_plan_en.txt --label
 ```
+
+On Linux and macOS the binary is at `build/govdoc`.
 
 <details>
-<summary>실행 결과 예시 보기</summary>
+<summary>Sample output</summary>
 
 ```
-확인이 필요한 곳을 4개 찾았어요.
-AI가 만든 제안이에요. 최종 판단은 담당자가 해 주세요.
+Found 6 item(s) to review.
+These are suggestions. You make the final call.
 
 [p2] DATE (high)
-  근거: 2027.03.01 ~ 2026.12.31
-  제안: 종료일을 확인해 주세요
-  이유: 종료일이 시작일보다 빨라요
+  evidence:   2027.03.01 ~ 2026.12.31
+  suggestion: Check the end date
+  reason:     The end date is earlier than the start date
+  source:     rules
 
 [p4] PII (critical)
-  근거: 900101-*******
-  제안: 주민등록번호를 지워 주세요
-  이유: 주민등록번호가 그대로 보여요
+  evidence:   900101-*******
+  suggestion: Remove the resident registration number
+  reason:     A resident registration number is exposed
+  source:     rules
 
-[p4] PII (critical)
-  근거: 010-****-****
-  제안: 개인 연락처를 가려 주세요
-  이유: 휴대전화 번호가 그대로 보여요
+[p3] AMOUNT (critical)
+  evidence:   ... a government grant of KRW 100,000 thousand and an institutional contribution of KRW 40,000 thousand
+  suggestion: ... adjust the components to add up to 150,000 thousand
+  reason:     The sum of the government grant and institutional contribution equals 140,000 thousand,
+              but the total budget is stated as 150,000 thousand.
+  source:     govdoc-test
 
-[p3] AMOUNT (high)
-  근거: … 정부출연금 100,000천원, 기관부담금 40,000천원으로 구성된다.
-  제안: … 기관부담금 50,000천원으로 구성된다.
-  이유: 구성 금액 합계가 총사업비와 달라요
+[p5] SPELL (medium)
+  evidence:   the the
+  suggestion: Change to "the"
+  reason:     The word "the" is repeated.
+  source:     govdoc-test
 ```
 
-예시 문서는 가상으로 만든 문서예요. 위 결과는 Qwen3 4B로 실제로 실행한 결과예요.
-이 모델은 맞춤법 오류(`있을것으로`)는 아직 찾지 못했어요. 라벨링과 미세조정으로 보완할 부분이에요.
+This is a real run on the fictional sample, using Qwen3 4B as a stand-in for Qwen3.5 (shortened for readability).
+The `source` field shows whether a finding came from the deterministic rules or from the model.
 
 </details>
 
 <br>
 
-## 왜 작은 Qwen 모델인가요
+## Why a small Qwen model
 
-정부사업 문서는 대부분 수 쪽에서 수십 쪽 분량이에요. 아주 큰 모델은 필요하지 않아요.
+Most government project documents run from a few pages to a few dozen pages. A huge model is not needed.
 
-- **Qwen3.5 Small** (0.8B · 2B · 4B · 9B): Apache-2.0 라이선스라 상업적으로도 쓸 수 있어요. 텍스트와 이미지를 함께 처리해서 나중에 화면 인식도 같은 모델로 할 수 있어요.
-- GPU가 8GB인 사무용 PC라면 **4B**, GPU가 없는 노트북이라면 **2B**를 권장해요.
-- 모델 이름만 바꾸면 다른 모델로 교체할 수 있어요 (`--model 이름`).
-
-<br>
-
-## 법과 표준을 지켜요
-
-나중에 법적 문제가 생기지 않도록 처음부터 아래 기준을 참고해서 설계해요. 자세한 내용은 [준수 체크리스트](docs/COMPLIANCE.md)에 있어요.
-
-| 구분 | 기준 |
-|---|---|
-| 국제 표준 | ISO/IEC 27001 정보보안 · 27701 개인정보 · 42001 AI 경영 · 23894 AI 위험관리 · 5259 AI 데이터 품질 |
-| 국내 법령 | 개인정보 보호법 · 인공지능기본법(2026.1.22 시행) |
-| 공공 보안 | 국가정보원 국가망보안체계(N²SF) · 소속 기관 보안 지침 |
-
-> 이 문서는 법률 자문이 아니에요. 실제 기관에 도입하기 전에는 보안담당관과 법무 검토를 꼭 받아야 해요.
+- **Qwen3.5 Small** (0.8B, 2B, 4B, 9B) is Apache-2.0 licensed, so commercial use is allowed. It handles text and images, so the same model can later read screenshots.
+- 4B is the recommended size for an office PC with an 8 GB GPU. 2B works on a laptop without a GPU.
+- Any Ollama model can be swapped in with `--model name`.
 
 <br>
 
-## 더 알아보기
+## Built with compliance in mind
 
-| 문서 | 내용 |
+The design follows these standards and regulations from day one, so the tool does not create legal problems later. Details are in the [compliance checklist](docs/COMPLIANCE.md).
+
+| Area | Reference |
 |---|---|
-| [아키텍처](docs/ARCHITECTURE.md) | 처리 단계와 데이터 유출을 막는 방법 |
-| [준수 체크리스트](docs/COMPLIANCE.md) | ISO와 국내 법령 대응표 |
-| [디자인 원칙](docs/DESIGN.md) | KRDS와 토스 라이팅 원칙 적용 방식 |
-| [로드맵](docs/ROADMAP.md) | 단계별 계획 |
-| [라벨 체계](labeling/label_schema.json) | 오류 유형과 판정 기준 |
+| International standards | ISO/IEC 27001 (information security), 27701 (privacy), 42001 (AI management), 23894 (AI risk), 5259 (AI data quality) |
+| Korean law | Personal Information Protection Act, AI Basic Act (in force since 2026-01-22) |
+| Public-sector security | NIS National Network Security Framework (N2SF) and each institution's security guidelines |
+
+> This is not legal advice. Any real deployment needs a review by the institution's security officer and legal team.
+
+<br>
+
+## Known limitations
+
+Being honest about what does not work yet:
+
+- Input is plain text only. HWP, HWPX, and PDF need to be converted first.
+- The rule check covers only resident registration numbers, mobile numbers, and date ranges.
+- Small models miss things. In testing, Qwen3 4B caught the spelling error in the English sample but missed the one in the Korean sample. Fine-tuning on labels is meant to close that gap.
+- Hardware figures in the docs are estimates and have not been measured yet.
+
+<br>
+
+## Documentation
+
+| Document | Contents |
+|---|---|
+| [Vibe coding log](docs/VIBE_CODING.md) | How the project was built with an AI agent, prompt by prompt |
+| [Architecture](docs/ARCHITECTURE.md) | Processing stages and how data leakage is prevented |
+| [Compliance checklist](docs/COMPLIANCE.md) | ISO standards and Korean regulations, mapped to the design |
+| [Roadmap](docs/ROADMAP.md) | What comes next |
+| [Label schema](labeling/label_schema.json) | Error types and reviewer verdicts |
+| [Agent rules](CLAUDE.md) | Instructions any AI coding agent must follow in this repository |
+| [Changelog](CHANGELOG.md) | Version history |
 
 <br>
 
 ---
 
-<sub>🤖 Vibe-coded with Claude Code · 예시 데이터는 모두 가상이에요 · 실제 문서와 개인정보는 이 저장소에 올리지 않아요</sub>
+<sub>Vibe-coded with Claude Code. All sample data is fictional. No real documents or personal data are ever committed to this repository.</sub>

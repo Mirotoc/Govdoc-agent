@@ -1,13 +1,13 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="Govdoc Agent - 내 PC 안에서만 동작하는 정부사업 문서 검토 AI">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="360" viewBox="0 0 1200 360" role="img" aria-label="Govdoc Agent - a government document reviewer that runs only on your own PC">
   <style>
-    text { font-family: 'Pretendard GOV', Pretendard, 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif; }
+    text { font-family: 'Pretendard GOV', Pretendard, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif; }
   </style>
   <rect width="1200" height="360" rx="24" fill="#ecf2fe"/>
   <rect x="64" y="64" width="128" height="32" rx="16" fill="#256ef4"/>
   <text x="128" y="86" font-size="15" font-weight="700" fill="#ffffff" text-anchor="middle">LOCAL ONLY</text>
   <text x="64" y="172" font-size="60" font-weight="700" fill="#1e2124">Govdoc Agent</text>
-  <text x="64" y="228" font-size="24" font-weight="700" fill="#464c53">문서는 PC 밖으로 나가지 않아요</text>
-  <text x="64" y="290" font-size="17" fill="#6d7882">정부사업 문서 검토 · 로컬 LLM · 사용자 라벨링 · C++17</text>
+  <text x="64" y="228" font-size="24" font-weight="700" fill="#464c53">Your documents never leave your PC</text>
+  <text x="64" y="290" font-size="17" fill="#6d7882">Government document review · Local LLM · Human-in-the-loop labeling · C++17</text>
 
   <g transform="translate(860 56)">
     <rect x="0" y="0" width="200" height="248" rx="16" fill="#ffffff" stroke="#b1cefb" stroke-width="2"/>

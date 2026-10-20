@@ -19,13 +19,16 @@ std::vector<Issue> check_rules(const std::vector<Block>& blocks) {
     for (const auto& b : blocks) {
         std::smatch m;
         if (std::regex_search(b.text, m, rrn))
-            issues.push_back({b.id, "PII", "critical", mask_pii(m.str()), "주민등록번호를 지워 주세요", "주민등록번호가 그대로 보여요"});
+            issues.push_back({b.id, "PII", "critical", mask_pii(m.str()),
+                              "Remove the resident registration number", "A resident registration number is exposed", "rules"});
         if (std::regex_search(b.text, m, phone))
-            issues.push_back({b.id, "PII", "critical", mask_pii(m.str()), "개인 연락처를 가려 주세요", "휴대전화 번호가 그대로 보여요"});
+            issues.push_back({b.id, "PII", "critical", mask_pii(m.str()),
+                              "Mask the personal phone number", "A mobile phone number is exposed", "rules"});
 
         for (std::sregex_iterator it(b.text.begin(), b.text.end(), period), end; it != end; ++it)
             if (date_key(*it, 4) < date_key(*it, 1))
-                issues.push_back({b.id, "DATE", "high", it->str(), "종료일을 확인해 주세요", "종료일이 시작일보다 빨라요"});
+                issues.push_back({b.id, "DATE", "high", it->str(),
+                                  "Check the end date", "The end date is earlier than the start date", "rules"});
     }
     return issues;
 }

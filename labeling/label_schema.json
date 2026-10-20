@@ -1,31 +1,31 @@
 {
-  "schema_version": "0.2.0",
+  "schema_version": "0.3.0",
   "error_types": [
-    {"id": "SPELL",      "name": "맞춤법·띄어쓰기",   "severity": "low",      "example": "있을것으로 → 있을 것으로"},
-    {"id": "TERM",       "name": "용어 불일치",       "severity": "low",      "example": "'수행기관'과 '주관기관'을 섞어 씀"},
-    {"id": "AMOUNT",     "name": "금액·합계 불일치",   "severity": "high",     "example": "세부 금액 합계와 총사업비가 다름"},
-    {"id": "DATE",       "name": "날짜·기간 오류",     "severity": "high",     "example": "종료일이 시작일보다 빠름"},
-    {"id": "MISSING",    "name": "필수 항목 누락",     "severity": "high",     "example": "연구책임자 서명란이 비어 있음"},
-    {"id": "FORMAT",     "name": "서식·양식 위반",     "severity": "medium",   "example": "공고 양식과 목차 순서가 다름"},
-    {"id": "PII",        "name": "개인정보 노출",      "severity": "critical", "example": "주민등록번호를 그대로 적음"},
-    {"id": "CONSIST",    "name": "앞뒤 내용 모순",     "severity": "medium",   "example": "본문은 참여인력 5명, 표는 4명"},
-    {"id": "REGULATION", "name": "지침 위반 의심",     "severity": "high",     "example": "인건비 비율이 공고 기준보다 높음"}
+    {"id": "SPELL",      "name": "Spelling and spacing",         "severity": "low",      "example": "\"the the\" -> \"the\""},
+    {"id": "TERM",       "name": "Inconsistent terminology",     "severity": "low",      "example": "\"lead institution\" and \"host institution\" used for the same party"},
+    {"id": "AMOUNT",     "name": "Amount or total mismatch",     "severity": "high",     "example": "Line items do not add up to the total budget"},
+    {"id": "DATE",       "name": "Date or period error",         "severity": "high",     "example": "End date is earlier than the start date"},
+    {"id": "MISSING",    "name": "Missing required item",        "severity": "high",     "example": "Principal investigator signature is empty"},
+    {"id": "FORMAT",     "name": "Template violation",           "severity": "medium",   "example": "Section order differs from the official template"},
+    {"id": "PII",        "name": "Exposed personal data",        "severity": "critical", "example": "Full resident registration number in the text"},
+    {"id": "CONSIST",    "name": "Internal contradiction",       "severity": "medium",   "example": "Body says 5 researchers, the table lists 4"},
+    {"id": "REGULATION", "name": "Possible guideline violation", "severity": "high",     "example": "Personnel cost ratio exceeds the call's limit"}
   ],
   "severity_levels": ["low", "medium", "high", "critical"],
   "verdicts": [
-    {"id": "ACCEPT", "key": "a", "name": "승인", "meaning": "AI 제안이 맞아요"},
-    {"id": "EDIT",   "key": "e", "name": "수정", "meaning": "지적은 맞지만 수정안을 고쳐요"},
-    {"id": "REJECT", "key": "r", "name": "거절", "meaning": "문제가 아니에요"}
+    {"id": "ACCEPT", "key": "a", "meaning": "The finding and the suggestion are correct"},
+    {"id": "EDIT",   "key": "e", "meaning": "The finding is correct, but the reviewer rewrites the suggestion"},
+    {"id": "REJECT", "key": "r", "meaning": "Not a real problem"}
   ],
   "record_fields": {
-    "block_id": "문단 번호 (p1, p2 …)",
-    "error_type": "error_types.id",
-    "severity": "severity_levels 중 하나",
-    "evidence": "개인정보를 가린 근거 원문",
-    "ai_suggestion": "AI 수정안",
-    "final_correction": "담당자가 확정한 수정안 (거절이면 빈 값)",
-    "verdict": "verdicts.id",
-    "model_version": "제안을 만든 모델 이름",
-    "created_at": "검수 시각"
+    "block_id": "Paragraph ID (p1, p2, ...)",
+    "error_type": "One of error_types.id",
+    "severity": "One of severity_levels",
+    "evidence": "Source text, with personal data masked",
+    "ai_suggestion": "The suggested fix",
+    "final_correction": "The fix confirmed by the reviewer (empty when rejected)",
+    "verdict": "One of verdicts.id",
+    "source": "\"rules\" or the name of the model that produced the finding",
+    "created_at": "Review time"
   }
 }
