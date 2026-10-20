@@ -1,0 +1,15 @@
+build/
+data/
+adapters/
+models/base/
+*.gguf
+*.safetensors
+*.bin
+*.hwp
+*.hwpx
+*.pdf
+*.docx
+*.db
+*.log
+.env
+.vs/

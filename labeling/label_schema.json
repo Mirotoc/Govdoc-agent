@@ -1,0 +1,31 @@
+{
+  "schema_version": "0.2.0",
+  "error_types": [
+    {"id": "SPELL",      "name": "맞춤법·띄어쓰기",   "severity": "low",      "example": "있을것으로 → 있을 것으로"},
+    {"id": "TERM",       "name": "용어 불일치",       "severity": "low",      "example": "'수행기관'과 '주관기관'을 섞어 씀"},
+    {"id": "AMOUNT",     "name": "금액·합계 불일치",   "severity": "high",     "example": "세부 금액 합계와 총사업비가 다름"},
+    {"id": "DATE",       "name": "날짜·기간 오류",     "severity": "high",     "example": "종료일이 시작일보다 빠름"},
+    {"id": "MISSING",    "name": "필수 항목 누락",     "severity": "high",     "example": "연구책임자 서명란이 비어 있음"},
+    {"id": "FORMAT",     "name": "서식·양식 위반",     "severity": "medium",   "example": "공고 양식과 목차 순서가 다름"},
+    {"id": "PII",        "name": "개인정보 노출",      "severity": "critical", "example": "주민등록번호를 그대로 적음"},
+    {"id": "CONSIST",    "name": "앞뒤 내용 모순",     "severity": "medium",   "example": "본문은 참여인력 5명, 표는 4명"},
+    {"id": "REGULATION", "name": "지침 위반 의심",     "severity": "high",     "example": "인건비 비율이 공고 기준보다 높음"}
+  ],
+  "severity_levels": ["low", "medium", "high", "critical"],
+  "verdicts": [
+    {"id": "ACCEPT", "key": "a", "name": "승인", "meaning": "AI 제안이 맞아요"},
+    {"id": "EDIT",   "key": "e", "name": "수정", "meaning": "지적은 맞지만 수정안을 고쳐요"},
+    {"id": "REJECT", "key": "r", "name": "거절", "meaning": "문제가 아니에요"}
+  ],
+  "record_fields": {
+    "block_id": "문단 번호 (p1, p2 …)",
+    "error_type": "error_types.id",
+    "severity": "severity_levels 중 하나",
+    "evidence": "개인정보를 가린 근거 원문",
+    "ai_suggestion": "AI 수정안",
+    "final_correction": "담당자가 확정한 수정안 (거절이면 빈 값)",
+    "verdict": "verdicts.id",
+    "model_version": "제안을 만든 모델 이름",
+    "created_at": "검수 시각"
+  }
+}
